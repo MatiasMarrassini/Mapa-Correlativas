@@ -20,7 +20,9 @@ import { Property } from "csstype";
 const Header = () => {
   const { displayedNode } = React.useContext(GraphContext);
   const CommonProps = {
-    height: { base: "8.7rem", md: "4.5rem" },
+    // En celular la barra crece si hace falta (ej. con el selector de optativas)
+    height: { base: "auto", md: "4.5rem" },
+    minHeight: { base: "8.7rem", md: "4.5rem" },
     bg: useColorModeValue("headerbg", "headerbgdark"),
   };
 

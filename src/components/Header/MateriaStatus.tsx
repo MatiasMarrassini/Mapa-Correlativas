@@ -16,7 +16,8 @@ import { unidadTexto } from "../../planes";
 
 // Cuando hay una materia seleccionada, te muestra el codigo, cuantos creditos da, etc
 const MateriaStatus = () => {
-  const { getNode, displayedNode } = React.useContext(GraphContext);
+  const { getNode, displayedNode, requisitosOptativa } =
+    React.useContext(GraphContext);
   const { user } = React.useContext(UserContext);
   const isPlan2020 = user.carrera.ano === 2020;
 
@@ -78,6 +79,22 @@ const MateriaStatus = () => {
             </Badge>
           </Tooltip>
         )}
+
+        {node &&
+          requisitosOptativa(node.id).map((o) => (
+            <Badge
+              key={o.id}
+              width="100%"
+              px={2}
+              colorScheme="orange"
+              variant="outline"
+              whiteSpace="normal"
+              maxWidth="46ch"
+              fontSize="0.6rem"
+            >
+              Requiere la optativa {o.materia} como correlativa anterior
+            </Badge>
+          ))}
       </Flex>
     </Flex>
   ) : (

@@ -3,6 +3,7 @@ import { GraphContext } from "../../MapContext";
 import { getCurrentCuatri } from "../../utils";
 import MateriaControl from "./MateriaControl";
 import MateriaStatus from "./MateriaStatus";
+import SelectorOptativa from "./SelectorOptativa";
 import { useHotkeys } from "react-hotkeys-hook";
 
 // Cuando una materia esta seleccionada, el header se convierte en solamente dos cosas:
@@ -74,6 +75,7 @@ const MateriaDisplay = () => {
   return (
     <>
       <MateriaStatus />
+      <SelectorOptativa />
       <MateriaControl />
     </>
   );
