@@ -38,6 +38,7 @@ const Header = () => {
 
   const AntiFlexProps = {
     height: 0,
+    minHeight: 0,
     p: 0,
     m: 0,
   };
