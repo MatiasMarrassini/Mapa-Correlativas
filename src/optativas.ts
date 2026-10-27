@@ -71,7 +71,10 @@ export const requisitosPendientes = (
 };
 
 const normalizar = (texto: string) =>
-  texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 
 // Filtra por nombre (sin importar tildes ni mayusculas) o por codigo, en orden alfabetico
 export const filtrarOptativas = (
