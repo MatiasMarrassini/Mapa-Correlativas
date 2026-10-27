@@ -34,3 +34,14 @@ test("UADE Informática 2021: horas, sin CBC, 4226 hs y el inglés como requisit
   );
   expect(uade.creditos.checkbox?.map((c) => c.nombrecorto)).toEqual(["Inglés"]);
 });
+
+test("UADE: Matemática Discreta es correlativa de Teoría de la Computación, no de Física II", () => {
+  const uade = CARRERAS.find((c) => c.id === "uade-informatica-2021")!;
+  const correlativas = (id: string) =>
+    uade.graph
+      .find((m) => m.id === id)
+      ?.correlativas?.split("-")
+      .sort();
+  expect(correlativas("3.1.055")).toEqual(["3.1.052"]);
+  expect(correlativas("3.4.215")).toEqual(["3.1.024", "3.4.077"]);
+});
