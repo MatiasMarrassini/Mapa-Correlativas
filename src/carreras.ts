@@ -685,6 +685,10 @@ export const CARRERAS: UserType.Carrera[] = [
     ano: 2021,
     unidad: "horas",
     graph: require("./data/uade-informatica-2021.json"),
+    optativasDelPlan: {
+      lugares: ["OPT1", "OPT2", "OPT3"],
+      materias: require("./data/uade-informatica-2021-optativas.json"),
+    },
     creditos: {
       total: 4226,
       electivas: 0,

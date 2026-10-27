@@ -4,7 +4,7 @@ Fecha: 2026-10-27 · Pedido por: Matías Marrassini · Proyecto: Mapa de Correla
 
 ## Intención
 
-El plan de Ingeniería en Informática de UADE (1621) tiene tres lugares de optativa (Optativa I, II y III, 68 hs cada uno). Hoy son nodos genéricos. Matías encontró la lista oficial de optativas (≈80 materias, algunas con correlativas) y quiere poder **elegir qué optativa cursa en cada lugar**, ver su nombre en el mapa y que se respeten sus correlativas.
+El plan de Ingeniería en Informática de UADE (1621) tiene tres lugares de optativa (Optativa I, II y III, 68 hs cada uno). Hoy son nodos genéricos. Matías encontró la lista oficial de optativas (80 materias, algunas con correlativas) y quiere poder **elegir qué optativa cursa en cada lugar**, ver su nombre en el mapa y que se respeten sus correlativas.
 
 Sigue siendo un proyecto para mostrar en el CV: importa que se vea bien y que el código quede prolijo.
 
@@ -159,4 +159,4 @@ Transcripta de las capturas que pasó Matías. Columna "requisitos": todas "Sin 
 | V2.3.003 | Obligaciones y Contratos | 2.3.001 |
 | V3.1.017 | Programación Operativa | |
 
-(81 materias. 3.1.049 = Probabilidad y Estadística y 3.1.055 = Física II, del plan.)
+(80 materias. 3.1.049 = Probabilidad y Estadística y 3.1.055 = Física II, del plan.)

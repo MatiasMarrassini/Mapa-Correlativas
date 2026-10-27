@@ -60,10 +60,10 @@ test("optativas del plan: lugares existen, ids únicos y correlativas válidas",
   });
 });
 
-test("UADE tiene 81 optativas y 3 lugares", () => {
+test("UADE tiene 80 optativas y 3 lugares", () => {
   const uade = CARRERAS.find((c) => c.id === "uade-informatica-2021")!;
   expect(uade.optativasDelPlan?.lugares).toEqual(["OPT1", "OPT2", "OPT3"]);
-  expect(uade.optativasDelPlan?.materias).toHaveLength(81);
+  expect(uade.optativasDelPlan?.materias).toHaveLength(80);
 });
 ```
 - [ ] **Step 2:** Correr → FAIL (no existe `optativasDelPlan`).
@@ -123,7 +123,7 @@ test("filtrarOptativas ignora tildes, mayúsculas y busca por código", () => {
   expect(filtrarOptativas(m, "diseno").map((o) => o.id)).toEqual(expect.arrayContaining(["3.4.180", "3.4.226", "4.8.130"]));
   expect(filtrarOptativas(m, "TESTING").map((o) => o.id)).toEqual(["3.4.228"]);
   expect(filtrarOptativas(m, "3.4.228").map((o) => o.id)).toEqual(["3.4.228"]);
-  expect(filtrarOptativas(m, "")).toHaveLength(81);
+  expect(filtrarOptativas(m, "")).toHaveLength(80);
 });
 
 test("lugarDeOptativa y esLugarOptativa", () => {

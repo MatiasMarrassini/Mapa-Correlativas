@@ -45,3 +45,33 @@ test("UADE: Matemática Discreta es correlativa de Teoría de la Computación, n
   expect(correlativas("3.1.055")).toEqual(["3.1.052"]);
   expect(correlativas("3.4.215")).toEqual(["3.1.024", "3.4.077"]);
 });
+
+test("optativas del plan: lugares existen, ids únicos y correlativas válidas", () => {
+  CARRERAS.filter((c) => c.optativasDelPlan).forEach((c) => {
+    const { lugares, materias } = c.optativasDelPlan!;
+    const delPlan = new Set(c.graph.map((m) => m.id));
+    const optativas = new Set(materias.map((m) => m.id));
+    lugares.forEach((l) =>
+      expect([c.id, l, delPlan.has(l)]).toEqual([c.id, l, true]),
+    );
+    expect(optativas.size).toBe(materias.length);
+    materias.forEach((m) =>
+      (m.correlativas ?? "")
+        .split("-")
+        .filter(Boolean)
+        .forEach((id) =>
+          expect([m.id, id, delPlan.has(id) || optativas.has(id)]).toEqual([
+            m.id,
+            id,
+            true,
+          ]),
+        ),
+    );
+  });
+});
+
+test("UADE tiene 80 optativas y 3 lugares", () => {
+  const uade = CARRERAS.find((c) => c.id === "uade-informatica-2021")!;
+  expect(uade.optativasDelPlan?.lugares).toEqual(["OPT1", "OPT2", "OPT3"]);
+  expect(uade.optativasDelPlan?.materias).toHaveLength(80);
+});

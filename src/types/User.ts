@@ -60,6 +60,23 @@ export namespace UserType {
     materia: string;
   }
 
+  // Una materia que se puede elegir para un lugar de optativa del plan
+  export interface OptativaJSON {
+    id: string;
+    materia: string;
+    // ids separados por guiones: pueden ser materias del plan u otras optativas
+    correlativas?: string;
+  }
+
+  // Que nodos del plan son lugares de optativa (ej. Optativa I) y que materias se pueden elegir
+  export interface OptativasDelPlan {
+    lugares: string[];
+    materias: OptativaJSON[];
+  }
+
+  // Lugar de optativa -> id de la optativa elegida
+  export type Elecciones = { [lugarId: string]: string };
+
   export interface Facultad {
     id: string;
     nombre: string;
@@ -71,6 +88,7 @@ export namespace UserType {
     ano: number;
     // Por defecto se cuentan créditos; algunas facultades (ej. UADE) cuentan horas
     unidad?: "creditos" | "horas";
+    optativasDelPlan?: OptativasDelPlan;
     beta?: boolean;
     graph: MateriaJSON[];
     creditos: Creditos;
