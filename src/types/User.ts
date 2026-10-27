@@ -94,6 +94,14 @@ export namespace UserType {
     aplazos?: number;
   }
 
+  // Todo lo que se guarda en el navegador (y lo que se exporta/importa)
+  export interface Registro {
+    version: 1;
+    ultimaCarrera: string;
+    ultimaPorFacultad: { [facultadid: string]: string };
+    carreras: { [carreraid: string]: CarreraData };
+  }
+
   export interface DBRecord {
     padron: string;
     ultimaCarrera: string;
