@@ -92,6 +92,8 @@ export namespace ReactGraphVisType {
     arrows: { to: { scaleFactor: number } } | undefined;
     color: { opacity: number } | string | undefined;
     id: string;
+    from: string;
+    to: string;
   }
 
   // Nuestra interfaz sobre los eventos de vis.js

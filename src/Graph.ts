@@ -285,6 +285,19 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
       return e;
     });
 
+    // Sin CBC no hay un nodo del que cuelguen todas las materias, y vis apila cada materia
+    // suelta como un arbol aparte. Las unimos con aristas invisibles desde la primera materia
+    // sin correlativas (las aristas invisibles no cuentan como correlativas, ver getters)
+    if (!tieneCBC(user.carrera)) {
+      const [ancla, ...raices] = user.carrera.graph.filter(
+        (n) => !n.correlativas,
+      );
+      if (ancla)
+        raices.forEach((n) =>
+          edges.push({ from: ancla.id, to: n.id, color: "transparent" }),
+        );
+    }
+
     const groups = Array.from(
       new Set(user.carrera.graph.map((n) => n.categoria)),
     );
@@ -293,7 +306,7 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     // y despues la usamos para chequear contra la carrera de la network
     const key = user.carrera.id;
     return { nodes, edges, groups, key };
-  }, [user.carrera.graph, user.carrera.id]);
+  }, [user.carrera]);
 
   // Cuando cambia la carrera, poblamos el nuevo grafo con lo que hay guardado
   // (o, simplemente aprobamos el CBC si el usuario no tenia nada y el plan tiene CBC)
@@ -1090,11 +1103,26 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     },
   };
 
+  const aristasVisibles = (id: string) => {
+    const ids = network.getConnectedEdges(id);
+    return edges.get({
+      filter: (e) => ids.includes(e.id) && e.color !== "transparent",
+    });
+  };
+
   // Definimos muuuuchos getters para tener acceso a todo tipo de nodos y no andar repitiendo todo
   const getters: GraphType.Getters = {
-    NodesFrom: (id) => network.getConnectedNodes(id, "from"),
-    NodesTo: (id) => network.getConnectedNodes(id, "to"),
-    NeighborNodes: (id) => network.getConnectedNodes(id),
+    // Las aristas invisibles solo sirven para el layout, no son correlativas
+    NodesFrom: (id) =>
+      aristasVisibles(id)
+        .filter((e) => e.to === id)
+        .map((e) => e.from),
+    NodesTo: (id) =>
+      aristasVisibles(id)
+        .filter((e) => e.from === id)
+        .map((e) => e.to),
+    NeighborNodes: (id) =>
+      aristasVisibles(id).map((e) => (e.from === id ? e.to : e.from)),
     NeighborEdges: (id) => network.getConnectedEdges(id),
     Cuatrimestres: () =>
       nodes
