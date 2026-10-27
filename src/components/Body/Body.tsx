@@ -1,4 +1,4 @@
-import { Box, Icon, SlideFade, useColorModeValue } from "@chakra-ui/react";
+import { Box, Icon, useColorModeValue } from "@chakra-ui/react";
 import React from "react";
 // @ts-ignore ignoramos porque react-graph-vis no tiene soporte para TypeScript
 import Graph from "react-graph-vis";
@@ -6,7 +6,6 @@ import Snowfall from "react-snowfall";
 import * as C from "../../constants";
 import { GraphContext, UserContext } from "../../MapContext";
 import CategoryTagStack from "./CategoryTagStack";
-import LoadingGraph from "./LoadingGraph";
 import { Fireworks } from "@fireworks-js/react";
 import Controls from "./Controls";
 import { FaSnowflake } from "react-icons/fa";
@@ -20,7 +19,7 @@ const isChristmasTime = today >= start && today <= end;
 const Body = () => {
   const { graph, createNetwork, networkRef, creditos, events } =
     React.useContext(GraphContext);
-  const { user, loggingIn } = React.useContext(UserContext);
+  const { user } = React.useContext(UserContext);
   const [snowfall, setSnowfall] = React.useState(true);
 
   const isRecibido = React.useMemo(() => {
@@ -45,9 +44,6 @@ const Body = () => {
           style={{ width: "100%", height: "100%", position: "fixed" }}
         />
       )}
-      <SlideFade in={loggingIn} unmountOnExit>
-        <LoadingGraph />
-      </SlideFade>
       <Graph
         key={user.carrera.id}
         graph={graph}

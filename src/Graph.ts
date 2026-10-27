@@ -4,6 +4,8 @@ import useResizeObserver from "use-resize-observer";
 import { CARRERAS } from "./carreras";
 import { CREDITOS } from "./constants";
 import Node from "./Node";
+import { tieneCBC } from "./planes";
+import { conCarreraElegida } from "./storage";
 import { COLORS, DOT_PATTERN_CONFIG } from "./theme";
 import { accCreditos, accCreditosNecesarios, accProportion } from "./utils";
 import { UserType } from "./types/User";
@@ -12,7 +14,7 @@ import { ReactGraphVisType } from "./types/ReactGraphVis";
 import { NodeType } from "./types/Node";
 
 const Graph = (userContext: UserType.Context): GraphType.Context => {
-  const { user, setUser, logged, saveUserGraph } = userContext;
+  const { user, setUser, saveUserGraph, actualizarRegistro } = userContext;
   const { colorMode } = useColorMode();
 
   // Usar un ref para capturar el colorMode actual dinámicamente
@@ -26,6 +28,9 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
 
   // Guardamos cuantos aplazos se tienen para computar en el promedio
   const [aplazos, setAplazos] = React.useState(0);
+
+  // Cuenta los cambios del grafo, para el guardado automatico
+  const [cambios, setCambios] = React.useState(0);
 
   // La network es nuestra interfaz con vis.js
   // Nos da acceso a los nodos, las aristas y varias funciones
@@ -290,13 +295,13 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     return { nodes, edges, groups, key };
   }, [user.carrera.graph, user.carrera.id]);
 
-  // Cuando cambia la carrera, poblamos el nuevo grafo con lo que hay en la DB
-  // (o, simplemente aprobamos el CBC si el usuario no tenia nada)
+  // Cuando cambia la carrera, poblamos el nuevo grafo con lo que hay guardado
+  // (o, simplemente aprobamos el CBC si el usuario no tenia nada y el plan tiene CBC)
   React.useEffect(() => {
     if (!network || graph.key !== network.key) return;
 
-    // Nos fijamos que el usuario tenga un mapa guardado en la db
-    const map = user.record.carreras[user.carrera.id];
+    // Nos fijamos que el usuario tenga un mapa guardado para este plan
+    const map = user.registro.carreras[user.carrera.id];
     if (map) {
       const toUpdate: NodeType[] = [];
 
@@ -338,8 +343,8 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
       showRelevantes();
       network.fit();
     } else {
-      // Si no tengo mapa en la DB (porque me desloguee, o porque soy un usuario nuevo en esta carrera),
-      //   reseteo absolutamente todo y solamente apruebo el CBC
+      // Si no tengo mapa guardado (porque es la primera vez en este plan, o importe un registro sin el),
+      //   reseteo absolutamente todo y solamente apruebo el CBC (si el plan tiene)
       user.carrera.creditos.checkbox?.forEach((ch) => (ch.check = false));
       optativasDispatch({ action: "override", value: [] });
       setAplazos(0);
@@ -348,14 +353,15 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
           .ALL()
           .map((n) => getNode(n.id).desaprobar().cursando(undefined)),
       );
-      aprobar("CBC", 0);
+      if (tieneCBC(user.carrera)) aprobar("CBC", 0);
+      else actualizar();
       actualizarNiveles();
       network.fit();
     }
     // Solo queremos poblar el grafo cuando el usuario cambia de carrera
-    // o cuando el usuario se loguea y cambia el padron
+    // o cuando importa un registro (cambia la revision)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.padron, graph.key, network]);
+  }, [user.revision, graph.key, network]);
 
   // Funcion importantisimaaaa, recorre todos los nodos y los actualiza a todos
   // Se llama casi siempre que pasa algo.
@@ -382,12 +388,14 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
           network,
           getNode,
           creditos: { creditosTotales, creditosCBC },
-          showLabels: logged,
+          showLabels: true,
           colorMode,
         }),
       ),
     );
     updateCreditos();
+    // Cada actualizacion es un cambio que hay que guardar (ver el efecto de guardado automatico)
+    setCambios((c) => c + 1);
   };
 
   // Funcion incomprensible que recorre todos los nodos y le ordena los levels (las columnas) en base a mil cosas
@@ -463,12 +471,12 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     network.body.emitter.emit("_dataChanged");
   };
 
-  // Guarda el "mapa" en la base de datos, con toda su metadata:
+  // Guarda el "mapa" en el navegador, con toda su metadata:
   // - materias: solo nos importan las materias aprobadas o "planeadas" (con cuatrimestre)
   // - checkboxes: los booleanos tipo "aprobe ingles"
   // - optativas: los creditos que no estan en el plan que se agregaron
   // - aplazos: la cantidad de aplazos seteado
-  const saveGraph = async () => {
+  const saveGraph = () => {
     const materias = nodes.get({
       filter: (n) => n.aprobada || n.nota === -1 || n.cuatrimestre,
       fields: ["id", "nota", "cuatrimestre"],
@@ -476,19 +484,21 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     const checkboxes = user.carrera.creditos.checkbox
       ?.filter((c) => c.check === true)
       .map((c) => c.nombre);
-    return saveUserGraph(user, materias, checkboxes, optativas, aplazos);
+    saveUserGraph(user, materias, checkboxes, optativas, aplazos);
   };
 
   ///
   // Interfaz de la UI con los cambios del usuario (carrera, orientacion, findecarrera)
   ///
   const changeCarrera = (id: string) => {
-    // Nos fijamos si ya habia algun registro en la DB para esta carrera
-    const userdata = user.record.carreras[id];
+    // Nos fijamos si ya habia algo guardado para esta carrera
+    const userdata = user.registro.carreras[id];
     const carrera = CARRERAS.find((c) => c.id === id);
     if (!carrera) return;
-    let newUser: UserType.Info = {
-      ...user,
+    let cambiosUser: Pick<
+      UserType.Info,
+      "carrera" | "orientacion" | "finDeCarrera"
+    > = {
       carrera,
       orientacion: null,
       finDeCarrera: null,
@@ -501,9 +511,11 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
       const finDeCarrera = carrera.finDeCarrera?.find(
         (c) => c.id === userdata.finDeCarrera,
       );
-      newUser = { ...newUser, orientacion, finDeCarrera };
+      cambiosUser = { ...cambiosUser, orientacion, finDeCarrera };
     }
-    setUser(newUser);
+    // Funcional, para no pisar el registro que se acaba de actualizar
+    actualizarRegistro((registro) => conCarreraElegida(registro, id));
+    setUser((prev) => ({ ...prev, ...cambiosUser }));
   };
 
   const changeOrientacion = (id: string) => {
@@ -1296,8 +1308,16 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
         : [],
   };
 
+  // Guardado automatico: `actualizar` se llama ante casi cualquier cambio del grafo y suma
+  // un cambio; lo demas (aplazos, orientacion, fin de carrera) se mira directo.
+  // Sin debounce a proposito: un cambio justo antes de cambiar de plan tiene que quedar guardado
+  React.useEffect(() => {
+    if (!network || graph.key !== network.key) return;
+    saveGraph();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cambios, optativas, aplazos, user.orientacion, user.finDeCarrera]);
+
   // Escape hatches: forzar actualizaciones
-  // - Cuando el usuario se desloguea/loguea, cambian las labels
   // - Cambiar las optativas agrega creditos, lo cual puede habilitar materias
   // - Cambiar el colorMode cambia el color de la label
   // - Cambiar la orientacion hace que se cambien los creditos
@@ -1308,13 +1328,7 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     actualizarNiveles();
     // Sabemos clavado en que momentos queremos forzar una actualización
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    logged,
-    colorMode,
-    optativas,
-    user.orientacion?.nombre,
-    user.finDeCarrera?.id,
-  ]);
+  }, [colorMode, optativas, user.orientacion?.nombre, user.finDeCarrera?.id]);
 
   return {
     graph,
@@ -1324,7 +1338,6 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     desaprobar,
     creditos,
     setNetwork,
-    saveGraph,
     restartGraphCuatris,
     changeCarrera,
     changeOrientacion,

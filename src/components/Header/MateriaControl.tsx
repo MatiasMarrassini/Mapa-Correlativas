@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { FaUndo } from "react-icons/fa";
-import { GraphContext, UserContext } from "../../MapContext";
+import { GraphContext } from "../../MapContext";
 import { getCurrentCuatri } from "../../utils";
 
 const ControlProps = {
@@ -60,8 +60,6 @@ const NumberStepperProps = {
 
 // Botonera para cambiar la nota y el cuatri de la materia seleccionada
 const MateriaControl = () => {
-  const { logged } = React.useContext(UserContext);
-
   const { getNode, aprobar, displayedNode, desaprobar, cursando } =
     React.useContext(GraphContext);
 
@@ -70,7 +68,7 @@ const MateriaControl = () => {
     [displayedNode, getNode],
   );
 
-  return displayedNode && logged && node?.id !== "CBC" ? (
+  return displayedNode && node?.id !== "CBC" ? (
     <Flex alignItems="center" height="fit-content">
       <Flex {...ControlProps} alignItems="center" p={1}>
         {node && node.nota > 0 ? (

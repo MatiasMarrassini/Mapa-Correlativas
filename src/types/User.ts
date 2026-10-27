@@ -102,12 +102,6 @@ export namespace UserType {
     carreras: { [carreraid: string]: CarreraData };
   }
 
-  export interface DBRecord {
-    padron: string;
-    ultimaCarrera: string;
-    carreras: { [carreraid: string]: CarreraData };
-  }
-
   export interface SaveGraph {
     (
       user: Info,
@@ -115,32 +109,23 @@ export namespace UserType {
       checkboxes: string[] | undefined,
       optativas: GraphType.Optativa[],
       aplazos: number,
-    ): Promise<void>;
+    ): void;
   }
 
-  export type LoginResult = "ok" | "notfound" | "error";
-
   export interface Context {
-    loading: boolean;
     user: Info;
-    logged: boolean;
-    padronInput: string;
-    loggingIn: boolean;
-    dbUnavailable: boolean;
-
-    login(padron: string): Promise<LoginResult>;
-    signup(padron: string): void;
-    logout(): void;
     setUser: React.Dispatch<React.SetStateAction<Info>>;
-    setPadronInput: React.Dispatch<React.SetStateAction<string>>;
     saveUserGraph: SaveGraph;
+    actualizarRegistro(fn: (registro: Registro) => Registro): void;
+    importarRegistro(registro: Registro): void;
   }
 
   export interface Info {
-    padron: string;
     carrera: Carrera;
     orientacion: Orientacion | undefined | null;
     finDeCarrera: FinDeCarrera | undefined | null;
-    record: DBRecord;
+    registro: Registro;
+    // Sube cada vez que se importa un registro, para volver a poblar el grafo
+    revision: number;
   }
 }

@@ -111,7 +111,6 @@ export namespace GraphType {
     getNode(id: string): NodeType | undefined;
     aprobar(id: string, nota: number): void;
     desaprobar(id: string): void;
-    saveGraph(): Promise<void>;
     restartGraphCuatris(): void;
     changeCarrera(id: string): void;
     changeOrientacion(id: string): void;

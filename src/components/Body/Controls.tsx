@@ -6,9 +6,8 @@ import {
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-import Sugerencias from "./Sugerencias";
 
-// Componente con links externos, setupeo de color mode y un toast para reportar bugs
+// Componente con el link al repo y el setupeo de color mode
 const Controls = () => {
   const { toggleColorMode } = useColorMode();
 
@@ -33,26 +32,11 @@ const Controls = () => {
           )}
         </Link>
       </Tooltip>
-      <Tooltip placement="top" label="FIUBA-Plan">
+      <Tooltip placement="top" label="MatiasMarrassini/Mapa-Correlativas">
         <Link
           isExternal
-          color={useColorModeValue("text", "textdark")}
-          href="https://fede.dm/FIUBA-Plan/"
+          href="https://github.com/MatiasMarrassini/Mapa-Correlativas"
         >
-          <Icon
-            boxSize={{ base: 4, md: 5 }}
-            ml={{ base: 1, md: 2 }}
-            viewBox="0 0 448 512"
-          >
-            <path
-              fill="currentColor"
-              d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm64-192c0-8.8 7.2-16 16-16h96c8.8 0 16 7.2 16 16v96c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-96zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"
-            />
-          </Icon>
-        </Link>
-      </Tooltip>
-      <Tooltip placement="top" label="FdelMazo/FIUBA-Map">
-        <Link isExternal href="https://github.com/fdelmazo/FIUBA-Map">
           <Icon
             boxSize={{ base: 4, md: 5 }}
             ml={{ base: 1, md: 2 }}
@@ -65,21 +49,6 @@ const Controls = () => {
           </Icon>
         </Link>
       </Tooltip>
-      <Tooltip placement="top" label="Invitame un Cafecito">
-        <Link isExternal href="https://cafecito.app/fdelmazo">
-          <Icon
-            boxSize={{ base: 4, md: 5 }}
-            ml={{ base: 1, md: 2 }}
-            viewBox="0 0 512 512"
-          >
-            <path
-              fill="currentColor"
-              d="M127.1 146.5c1.3 7.7 8 13.5 16 13.5h16.5c9.8 0 17.6-8.5 16.3-18-3.8-28.2-16.4-54.2-36.6-74.7-14.4-14.7-23.6-33.3-26.4-53.5C111.8 5.9 105 0 96.8 0H80.4C70.6 0 63 8.5 64.1 18c3.9 31.9 18 61.3 40.6 84.4 12 12.2 19.7 27.5 22.4 44.1zm112 0c1.3 7.7 8 13.5 16 13.5h16.5c9.8 0 17.6-8.5 16.3-18-3.8-28.2-16.4-54.2-36.6-74.7-14.4-14.7-23.6-33.3-26.4-53.5C223.8 5.9 217 0 208.8 0h-16.4c-9.8 0-17.5 8.5-16.3 18 3.9 31.9 18 61.3 40.6 84.4 12 12.2 19.7 27.5 22.4 44.1zM400 192H32c-17.7 0-32 14.3-32 32v192c0 53 43 96 96 96h192c53 0 96-43 96-96h16c61.8 0 112-50.2 112-112s-50.2-112-112-112zm0 160h-16v-96h16c26.5 0 48 21.5 48 48s-21.5 48-48 48z"
-            />
-          </Icon>
-        </Link>
-      </Tooltip>
-      <Sugerencias />
     </Box>
   );
 };

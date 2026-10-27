@@ -3,19 +3,6 @@ import { COLORS } from "./theme";
 import { UserType } from "./types/User";
 import { NodeType } from "./types/Node";
 
-export const DB_PROXY = "https://fiuba-map-db.vercel.app/api/db";
-
-export const BUGS_FORM =
-  "https://docs.google.com/forms/d/1Mr4-4qWqZKaobjG3GI30aPvC5qlMsd6Eib3YGUbLd2k/formResponse";
-
-export const BUGS_FORM_ENTRIES = {
-  padron: "entry.108884877",
-  carrera: "entry.30310619",
-  orientacion: "entry.2052513370",
-  finDeCarrera: "entry.1835776497",
-  bug: "entry.817568535",
-};
-
 // Dibuja un rombo
 const drawFinDeCarrera = ({
   ctx,

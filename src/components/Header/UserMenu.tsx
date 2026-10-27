@@ -4,22 +4,18 @@ import {
   Button,
   Menu,
   MenuButton,
-  MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Icon,
   IconButton,
   Tooltip,
-  Text,
   Box,
   PlacementWithLogical,
   ResponsiveValue,
-  useToast,
 } from "@chakra-ui/react";
-import { BiLogOut } from "react-icons/bi";
 import { Property } from "csstype";
-import { FaSave, FaUndo } from "react-icons/fa";
+import { FaUndo } from "react-icons/fa";
 import { GraphContext, UserContext } from "../../MapContext";
 
 const ButtonProps = {
@@ -37,133 +33,88 @@ const TooltipProps = {
   textAlign: "center" as ResponsiveValue<Property.TextAlign>,
 };
 
-// Menu para elegir orientacion y fin de carrera (y para "cerrar sesion")
-// Es un botoncito de settings donde esta el padron, arriba a la izquierda de la app
-// Tambien botones para guardar el grafo, y reiniciar los cuatrimestres planeados
+// Menu para elegir orientacion y fin de carrera (solo si el plan tiene algo para elegir)
+// Es un botoncito de settings arriba a la izquierda de la app
+// Tambien el boton para reiniciar los cuatrimestres planeados
+// (no hay boton de guardar: todo se guarda solo)
 const UserMenu = () => {
-  const { logout, user } = React.useContext(UserContext);
+  const { user } = React.useContext(UserContext);
 
   const {
-    saveGraph,
     restartGraphCuatris,
     getters,
     changeOrientacion,
     changeFinDeCarrera,
     getNode,
   } = React.useContext(GraphContext);
-  const [saving, setSaving] = React.useState(false);
-  const toast = useToast();
-
-  const isBeta = user.carrera.beta;
+  const tieneConfiguracion =
+    user.carrera.eligeOrientaciones || user.carrera.finDeCarrera;
   return (
     <Box>
-      <Menu
-        closeOnSelect={false}
-        defaultIsOpen={
-          (user.carrera.eligeOrientaciones && !user.orientacion) ||
-          (user.carrera.finDeCarrera && !user.finDeCarrera)
-        }
-      >
-        <MenuButton
-          w="20ch"
-          textAlign="left"
-          as={Button}
-          leftIcon={<SettingsIcon />}
-          {...ButtonProps}
+      {tieneConfiguracion && (
+        <Menu
+          closeOnSelect={false}
+          defaultIsOpen={
+            (user.carrera.eligeOrientaciones && !user.orientacion) ||
+            (user.carrera.finDeCarrera && !user.finDeCarrera)
+          }
         >
-          <Text overflow="hidden" textOverflow="ellipsis">
-            {user.padron}
-          </Text>
-        </MenuButton>
-        <MenuList>
-          {user.carrera.finDeCarrera && (
-            <MenuOptionGroup
-              onChange={(value) => {
-                changeFinDeCarrera(value as string);
-              }}
-              value={user.finDeCarrera?.id || "none"}
-              title="Fin de Carrera"
-              type="radio"
-            >
-              <MenuItemOption type="checkbox" value={"none"}>
-                No me decidí
-              </MenuItemOption>
+          <MenuButton as={Button} leftIcon={<SettingsIcon />} {...ButtonProps}>
+            Configuración
+          </MenuButton>
+          <MenuList>
+            {user.carrera.finDeCarrera && (
+              <MenuOptionGroup
+                onChange={(value) => {
+                  changeFinDeCarrera(value as string);
+                }}
+                value={user.finDeCarrera?.id || "none"}
+                title="Fin de Carrera"
+                type="radio"
+              >
+                <MenuItemOption type="checkbox" value={"none"}>
+                  No me decidí
+                </MenuItemOption>
 
-              {user.carrera.finDeCarrera &&
-                Object.values(user.carrera.finDeCarrera).map((v) => (
-                  <MenuItemOption type="checkbox" value={v.id} key={v.id}>
-                    {getNode(v.materia)?.materia}
-                  </MenuItemOption>
-                ))}
-            </MenuOptionGroup>
-          )}
-
-          {user.carrera.eligeOrientaciones && (
-            <MenuOptionGroup
-              onChange={(value) => {
-                changeOrientacion(value as string);
-              }}
-              value={user.orientacion?.nombre || "none"}
-              title="Orientación"
-              type="radio"
-            >
-              <MenuItemOption type="checkbox" value={"none"}>
-                No me decidí
-              </MenuItemOption>
-
-              {user.carrera.orientaciones &&
-                user.carrera.orientaciones
-                  .filter((o) => !o.nonEligible)
-                  .map((o) => (
-                    <MenuItemOption
-                      type="checkbox"
-                      value={o.nombre}
-                      key={o.nombre}
-                    >
-                      {o.nombre}
+                {user.carrera.finDeCarrera &&
+                  Object.values(user.carrera.finDeCarrera).map((v) => (
+                    <MenuItemOption type="checkbox" value={v.id} key={v.id}>
+                      {getNode(v.materia)?.materia}
                     </MenuItemOption>
                   ))}
-            </MenuOptionGroup>
-          )}
+              </MenuOptionGroup>
+            )}
 
-          <MenuItem onClick={logout} icon={<BiLogOut size={"1.8em"} />}>
-            <strong>Cerrar Sesión</strong>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-      <Tooltip
-        {...TooltipProps}
-        label={
-          isBeta
-            ? "No se pueden guardar datos hasta que se oficialice el plan"
-            : "Guardar datos"
-        }
-      >
-        <IconButton
-          {...ButtonProps}
-          ml={2}
-          isLoading={saving}
-          onClick={async () => {
-            setSaving(true);
-            await saveGraph().catch((err) => {
-              console.error(err);
-              toast({
-                status: "error",
-                variant: "subtle",
-                title: "Error al guardar los datos",
-                duration: 4000,
-                isClosable: true,
-              });
-            });
-            setSaving(false);
-          }}
-          isDisabled={isBeta}
-          aria-label="Guardar los datos del plan"
-        >
-          <Icon boxSize={5} as={FaSave} />
-        </IconButton>
-      </Tooltip>
+            {user.carrera.eligeOrientaciones && (
+              <MenuOptionGroup
+                onChange={(value) => {
+                  changeOrientacion(value as string);
+                }}
+                value={user.orientacion?.nombre || "none"}
+                title="Orientación"
+                type="radio"
+              >
+                <MenuItemOption type="checkbox" value={"none"}>
+                  No me decidí
+                </MenuItemOption>
 
+                {user.carrera.orientaciones &&
+                  user.carrera.orientaciones
+                    .filter((o) => !o.nonEligible)
+                    .map((o) => (
+                      <MenuItemOption
+                        type="checkbox"
+                        value={o.nombre}
+                        key={o.nombre}
+                      >
+                        {o.nombre}
+                      </MenuItemOption>
+                    ))}
+              </MenuOptionGroup>
+            )}
+          </MenuList>
+        </Menu>
+      )}
       {getters.Cuatrimestres().length > 0 && (
         <Tooltip {...TooltipProps} label="Limpiar todos los cuatris">
           <IconButton
