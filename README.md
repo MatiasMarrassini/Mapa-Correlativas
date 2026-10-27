@@ -1,28 +1,58 @@
-# [FIUBA Map](https://fede.dm/FIUBA-Map/)
+# [Mapa de Correlativas](https://matiasmarrassini.github.io/Mapa-Correlativas/)
 
-Mapa de materias y sus correlativas de la Facultad de Ingeniería
+Mapa interactivo de materias y correlativas, para distintas facultades.
 
----
+Elegís tu facultad y tu carrera, marcás las materias que aprobaste y ves de un vistazo qué podés cursar, cuánto te falta y tu promedio. Hoy trae todas las carreras de la Facultad de Ingeniería de la UBA (FIUBA) e Ingeniería en Informática de la UADE (plan 2021), y está pensado para sumar más facultades sin tocar código.
 
-La idea de este proyecto es presentar de una manera interactiva el plan de estudios de las carreras de la Facultad de Ingeniería, Universidad de Buenos Aires, para saber que materias se pueden cursar, cuantos créditos se tienen actualmente y demás.
+<a href="https://matiasmarrassini.github.io/Mapa-Correlativas/"><img src="public/fmap.png" alt="Mapa de Correlativas con Ingeniería en Informática de UADE"></a>
 
-<a href='https://imgur.com/QkXbwFc'><img src='public/fmap.png'></a>
+## Qué hace
 
-- Tiene todas las carreras que se dan en la Facultad de Ingeniería, en sus respectivos últimos planes de estudio.
+- **Varias facultades:** primero se elige la facultad y después la carrera/plan.
+- **Créditos u horas:** cada plan define cómo se mide el avance (FIUBA cuenta créditos, UADE horas) y si tiene CBC.
+- **Correlativas:** las materias se habilitan cuando aprobás sus correlativas; al pasar el mouse se resaltan.
+- **Progreso y promedio:** barra de avance por grupo (obligatorias, electivas, requisitos como el examen de inglés) y promedio con aplazos.
+- **Planificación:** asignar materias a cuatrimestres futuros.
+- **Sin cuentas ni servidor:** todo se guarda automáticamente en tu navegador.
+- **Exportar / importar:** bajás tu avance a un `.json` y lo cargás en otro navegador (o lo usás de respaldo).
 
-- Todas las carreras incluyen todas las materias electivas y todas las materias de sus respectivas orientaciones.
-
-- Trackea la cantidad de créditos que se tienen en la carrera, incluyendo si se quiere terminar con tésis/tpp, y que orientación se elige
-
-- Base de datos! Se pueden marcar todas las materias apobradas y guardarlas bajo un padrón (o cualquier clave).
-
-- Poner materias en final! Para no olvidarse los finales colgados.
-
----
-
-## Desarrollo
+## Cómo correrlo
 
 ```sh
 npm install
-npm start # localhost:3000
+npm start   # http://localhost:3000/Mapa-Correlativas
+npm test    # tests de datos, guardado y helpers
 ```
+
+## Cómo agregar una facultad
+
+1. Cargar cada plan como un json en `src/data/`. Cada materia es un objeto:
+
+   ```json
+   { "id": "3.4.071", "materia": "Programación I", "creditos": 68, "correlativas": "3.4.069", "categoria": "Materias Obligatorias", "level": 2 }
+   ```
+
+   - `creditos`: créditos u horas que otorga, según la unidad del plan.
+   - `correlativas`: ids de las materias necesarias, separados por `-`.
+   - `level`: columna donde se dibuja (por ejemplo, el cuatrimestre sugerido).
+   - Si el plan tiene CBC, el json lleva el nodo `"CBC"` (como los de FIUBA); si no, no hace falta nada.
+
+2. En `src/carreras.ts`:
+   - sumar la facultad a `FACULTADES`;
+   - agregar cada plan a `CARRERAS` (`unidad: "horas"` si no se cuentan créditos; `creditos.total`, y requisitos que no son materias en `creditos.checkbox`);
+   - agruparlos en `PLANES` con su `facultad`.
+
+Los tests (`src/carreras.test.ts`) verifican que todas las correlativas existan y que cada plan esté en una facultad.
+
+## Cambios respecto del original
+
+Este proyecto es un fork de FIUBA-Map. Respecto del original:
+
+- Selector de facultad y soporte para planes medidos en horas y sin CBC.
+- Plan de Ingeniería en Informática de UADE (2021).
+- Sin login por padrón ni base de datos remota: guardado automático en `localStorage`, con exportar/importar.
+- Tests con Jest para los datos, el guardado y los helpers de planes.
+
+## Créditos
+
+Basado en [FIUBA-Map](https://github.com/fdelmazo/FIUBA-Map) de Federico del Mazo (licencia MIT). Este fork mantiene la misma [licencia](LICENSE).

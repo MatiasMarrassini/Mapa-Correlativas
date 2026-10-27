@@ -13,3 +13,5 @@ jobs:
         uses: fdelmazo/node-to-gh-action@v2
       - id: typescript-check
         run: npx tsc --noEmit
+      - id: tests
+        run: npm test -- --watchAll=false
