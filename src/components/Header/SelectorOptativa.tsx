@@ -29,9 +29,9 @@ const SelectorOptativa = () => {
   const [busqueda, setBusqueda] = React.useState("");
   const buscadorRef = React.useRef<HTMLInputElement>(null);
 
-  const materias = user.carrera.optativasDelPlan?.materias ?? [];
+  const materias = user.carrera.optativasDelPlan?.materias;
   const filtradas = React.useMemo(
-    () => filtrarOptativas(materias, busqueda),
+    () => filtrarOptativas(materias ?? [], busqueda),
     [materias, busqueda],
   );
 
