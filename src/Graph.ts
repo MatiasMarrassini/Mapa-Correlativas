@@ -4,6 +4,13 @@ import useResizeObserver from "use-resize-observer";
 import { CARRERAS } from "./carreras";
 import { CREDITOS } from "./constants";
 import Node from "./Node";
+import {
+  correlativasDeEleccion,
+  limpiarElecciones,
+  lugarDeOptativa,
+  optativaPorId,
+  requisitosPendientes,
+} from "./optativas";
 import { planesDeFacultad, tieneCBC } from "./planes";
 import { conCarreraElegida } from "./storage";
 import { COLORS, DOT_PATTERN_CONFIG } from "./theme";
@@ -28,6 +35,9 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
 
   // Guardamos cuantos aplazos se tienen para computar en el promedio
   const [aplazos, setAplazos] = React.useState(0);
+
+  // Que optativa se eligio en cada lugar de optativa del plan (ej. Optativa I)
+  const [elecciones, setElecciones] = React.useState<UserType.Elecciones>({});
 
   // Cuenta los cambios del grafo, para el guardado automatico
   const [cambios, setCambios] = React.useState(0);
@@ -322,6 +332,8 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
 
     // Nos fijamos que el usuario tenga un mapa guardado para este plan
     const map = user.registro.carreras[user.carrera.id];
+    // Las elecciones guardadas pueden apuntar a optativas que ya no existen o estar repetidas
+    setElecciones(limpiarElecciones(user.carrera, map?.elecciones));
     if (map) {
       const toUpdate: NodeType[] = [];
 
@@ -404,6 +416,10 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
           creditos: { creditosTotales, creditosCBC },
           showLabels: true,
           colorMode,
+          requisitosOptativa,
+          nombreEleccion: (id) =>
+            elecciones[id] &&
+            optativaPorId(user.carrera, elecciones[id]!)?.materia,
         }),
       ),
     );
@@ -498,7 +514,7 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     const checkboxes = user.carrera.creditos.checkbox
       ?.filter((c) => c.check === true)
       .map((c) => c.nombre);
-    saveUserGraph(user, materias, checkboxes, optativas, aplazos, {});
+    saveUserGraph(user, materias, checkboxes, optativas, aplazos, elecciones);
   };
 
   ///
@@ -531,6 +547,23 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     actualizarRegistro((registro) => conCarreraElegida(registro, id));
     setUser((prev) => ({ ...prev, ...cambiosUser }));
   };
+
+  // Elegir (o dejar sin elegir) la optativa de un lugar
+  const elegirOptativa = (lugarId: string, optativaId: string | undefined) => {
+    const nuevas = { ...elecciones };
+    if (optativaId) nuevas[lugarId] = optativaId;
+    else delete nuevas[lugarId];
+    setElecciones(limpiarElecciones(user.carrera, nuevas));
+  };
+
+  // Correlativas que son otras optativas y todavia no se cumplen (para el aviso y la habilitacion)
+  const requisitosOptativa = (lugarId: string) =>
+    requisitosPendientes(
+      user.carrera,
+      elecciones,
+      lugarId,
+      (id) => !!getNode(id)?.aprobada,
+    );
 
   // Al cambiar de facultad se abre el ultimo plan usado en ella (o el primero de la lista)
   const changeFacultad = (facultadid: string) => {
@@ -1346,7 +1379,42 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     if (!network || graph.key !== network.key) return;
     saveGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cambios, optativas, aplazos, user.orientacion, user.finDeCarrera]);
+  }, [
+    cambios,
+    optativas,
+    aplazos,
+    elecciones,
+    user.orientacion,
+    user.finDeCarrera,
+  ]);
+
+  // Cuando cambian las optativas elegidas, rehacemos sus flechas: desde cada correlativa
+  // del plan, y desde el lugar donde este elegida cada correlativa que sea otra optativa
+  React.useEffect(() => {
+    if (!network || graph.key !== network.key) return;
+    edges.remove(
+      edges.get({ filter: (e) => e.id.startsWith("opt:") }).map((e) => e.id),
+    );
+    const nuevas = Object.entries(elecciones).flatMap(([lugar, elegida]) => {
+      const { delPlan, optativas } = correlativasDeEleccion(
+        user.carrera,
+        elegida,
+      );
+      const desde = [
+        ...delPlan,
+        ...optativas.flatMap((id) => lugarDeOptativa(elecciones, id) ?? []),
+      ];
+      return desde.map((from) => ({
+        id: `opt:${from}->${lugar}`,
+        from,
+        to: lugar,
+        smooth: { enabled: true, type: "curvedCW", roundness: 0.1 },
+      }));
+    });
+    edges.add(nuevas);
+    actualizar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elecciones, network]);
 
   // Escape hatches: forzar actualizaciones
   // - Cambiar las optativas agrega creditos, lo cual puede habilitar materias
@@ -1372,6 +1440,9 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     restartGraphCuatris,
     changeCarrera,
     changeFacultad,
+    elecciones,
+    elegirOptativa,
+    requisitosOptativa,
     changeOrientacion,
     changeFinDeCarrera,
     toggleCheckbox,

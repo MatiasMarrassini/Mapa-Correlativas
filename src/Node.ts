@@ -152,7 +152,8 @@ class Node implements NodeType {
           todoAprobado && creditosTotales - creditosCBC >= this.requiere;
       }
     }
-    return todoAprobado;
+    // En los lugares de optativa, las correlativas que son otras optativas no siempre tienen flecha
+    return todoAprobado && ctx.requisitosOptativa(this.id).length === 0;
   }
 
   // Actualiza el nodo de acuerdo a tooodas sus propiedades
@@ -174,6 +175,9 @@ class Node implements NodeType {
     this.group = grupoDefault;
 
     let labelDefault = breakWords(this.materia);
+    // En los lugares de optativa, mostramos debajo la optativa elegida
+    const eleccion = ctx.nombreEleccion(this.id);
+    if (eleccion) labelDefault += "\n" + breakWords(eleccion);
     if (showLabels && this.id !== "CBC") {
       if (this.aprobada && this.nota > 0)
         labelDefault += "\n[" + this.nota + "]";

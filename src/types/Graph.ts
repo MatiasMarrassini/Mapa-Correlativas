@@ -114,6 +114,9 @@ export namespace GraphType {
     restartGraphCuatris(): void;
     changeCarrera(id: string): void;
     changeFacultad(facultadid: string): void;
+    elecciones: UserType.Elecciones;
+    elegirOptativa(lugarId: string, optativaId: string | undefined): void;
+    requisitosOptativa(lugarId: string): UserType.OptativaJSON[];
     changeOrientacion(id: string): void;
     changeFinDeCarrera(id: string): void;
     toggleCheckbox(c: string, forceTrue?: boolean): void;
@@ -134,5 +137,7 @@ export namespace GraphType {
     network: ReactGraphVisType.Network;
 
     getNode(id: string): NodeType | undefined;
+    requisitosOptativa(id: string): UserType.OptativaJSON[];
+    nombreEleccion(id: string): string | undefined;
   }
 }

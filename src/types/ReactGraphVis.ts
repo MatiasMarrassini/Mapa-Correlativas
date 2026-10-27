@@ -84,6 +84,8 @@ export namespace ReactGraphVisType {
           },
     ): EdgeType[];
     update(nodes: EdgeType[]): void;
+    add(edges: Partial<EdgeType>[] | object[]): void;
+    remove(ids: string[]): void;
   }
 
   export interface EdgeType {
