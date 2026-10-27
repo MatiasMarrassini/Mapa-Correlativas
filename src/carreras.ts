@@ -679,6 +679,34 @@ export const CARRERAS: UserType.Carrera[] = [
       ],
     },
   },
+  {
+    id: "uade-informatica-2021",
+    link: "https://www.uade.edu.ar/facultad-de-ingenieria-y-ciencias-exactas/",
+    ano: 2021,
+    unidad: "horas",
+    graph: require("./data/uade-informatica-2021.json"),
+    creditos: {
+      total: 4226,
+      electivas: 0,
+      checkbox: [
+        {
+          nombre: "Examen de Inglés",
+          nombrecorto: "Inglés",
+          bg: COLORS.enfinal[50],
+          color: "enfinal",
+        },
+      ],
+    },
+  },
+];
+
+// Facultades disponibles en el primer desplegable
+// Para agregar una facultad: sumarla acá, cargar el json de cada plan en `src/data/`,
+// agregar los planes a `CARRERAS` (con `unidad: "horas"` si no se cuentan créditos)
+// y agruparlos en `PLANES` con su `facultad`. El CBC solo existe si el json tiene el nodo "CBC"
+export const FACULTADES: UserType.Facultad[] = [
+  { id: "fiuba", nombre: "FIUBA" },
+  { id: "uade", nombre: "UADE" },
 ];
 
 // Acá se define como se le presentan al usuario la lista de planes/carreras
@@ -687,66 +715,85 @@ export const PLANES = [
   {
     nombre: "Ingeniería Civil",
     nombrecorto: "Civil",
+    facultad: "fiuba",
     planes: ["civil", "civil-2020"],
   },
   {
     nombre: "Ingeniería en Alimentos",
     nombrecorto: "Alimentos",
+    facultad: "fiuba",
     planes: ["alimentos", "alimentos-2020"],
   },
   {
     nombre: "Bioingeniería",
     nombrecorto: "Bioingeniería",
+    facultad: "fiuba",
     planes: ["bioingenieria-2020"],
   },
   {
     nombre: "Ingeniería en Energía Eléctrica",
     nombrecorto: "Electricista",
+    facultad: "fiuba",
     planes: ["electricista", "energia-electrica-2020"],
   },
   {
     nombre: "Ingeniería Electrónica",
     nombrecorto: "Electrónica",
+    facultad: "fiuba",
     planes: ["electronica", "electronica-2020"],
   },
   {
     nombre: "Ingeniería en Agrimensura",
     nombrecorto: "Agrimensura",
+    facultad: "fiuba",
     planes: ["agrimensura", "agrimensura-2020"],
   },
   {
     nombre: "Ingeniería en Informática",
     nombrecorto: "Informática",
+    facultad: "fiuba",
     planes: ["informatica", "informatica-2020"],
   },
   {
     nombre: "Ingeniería en Petróleo",
     nombrecorto: "Petróleo",
+    facultad: "fiuba",
     planes: ["petroleo", "petroleo-2020"],
   },
   {
     nombre: "Ingeniería Industrial",
     nombrecorto: "Industrial",
+    facultad: "fiuba",
     planes: ["industrial", "industrial-2020"],
   },
   {
     nombre: "Ingeniería Mecánica",
     nombrecorto: "Mecánica",
+    facultad: "fiuba",
     planes: ["mecanica", "mecanica-2020"],
   },
   {
     nombre: "Ingeniería Naval",
     nombrecorto: "Naval",
+    facultad: "fiuba",
     planes: ["naval", "naval-2020"],
   },
   {
     nombre: "Ingeniería Química",
     nombrecorto: "Química",
+    facultad: "fiuba",
     planes: ["quimica", "quimica-2020"],
   },
   {
     nombre: "Licenciatura en Análisis de Sistemas",
     nombrecorto: "Sistemas",
+    facultad: "fiuba",
     planes: ["sistemasviejo", "sistemas"],
+  },
+  {
+    nombre: "Ingeniería en Informática",
+    nombrecorto: "Informática",
+    facultad: "uade",
+    planes: ["uade-informatica-2021"],
   },
 ];

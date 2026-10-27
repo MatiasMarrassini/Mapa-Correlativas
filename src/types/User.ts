@@ -60,10 +60,17 @@ export namespace UserType {
     materia: string;
   }
 
+  export interface Facultad {
+    id: string;
+    nombre: string;
+  }
+
   export interface Carrera {
     id: string;
     link: string;
     ano: number;
+    // Por defecto se cuentan créditos; algunas facultades (ej. UADE) cuentan horas
+    unidad?: "creditos" | "horas";
     beta?: boolean;
     graph: MateriaJSON[];
     creditos: Creditos;
