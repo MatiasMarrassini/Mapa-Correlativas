@@ -4,7 +4,7 @@ import useResizeObserver from "use-resize-observer";
 import { CARRERAS } from "./carreras";
 import { CREDITOS } from "./constants";
 import Node from "./Node";
-import { tieneCBC } from "./planes";
+import { planesDeFacultad, tieneCBC } from "./planes";
 import { conCarreraElegida } from "./storage";
 import { COLORS, DOT_PATTERN_CONFIG } from "./theme";
 import { accCreditos, accCreditosNecesarios, accProportion } from "./utils";
@@ -516,6 +516,14 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     // Funcional, para no pisar el registro que se acaba de actualizar
     actualizarRegistro((registro) => conCarreraElegida(registro, id));
     setUser((prev) => ({ ...prev, ...cambiosUser }));
+  };
+
+  // Al cambiar de facultad se abre el ultimo plan usado en ella (o el primero de la lista)
+  const changeFacultad = (facultadid: string) => {
+    const planes = planesDeFacultad(facultadid);
+    const ultimo = user.registro.ultimaPorFacultad[facultadid];
+    const id = ultimo && planes.includes(ultimo) ? ultimo : planes[0];
+    if (id) changeCarrera(id);
   };
 
   const changeOrientacion = (id: string) => {
@@ -1340,6 +1348,7 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     setNetwork,
     restartGraphCuatris,
     changeCarrera,
+    changeFacultad,
     changeOrientacion,
     changeFinDeCarrera,
     toggleCheckbox,

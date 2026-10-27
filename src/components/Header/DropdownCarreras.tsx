@@ -21,6 +21,7 @@ import {
 import { Property } from "csstype";
 import { CARRERAS, PLANES } from "../../carreras";
 import { GraphContext, UserContext } from "../../MapContext";
+import { facultadDePlan } from "../../planes";
 
 const AnoBadge = ({
   ano,
@@ -105,7 +106,9 @@ const DropdownCarreras = () => {
           </MenuButton>
         </Tooltip>
         <MenuList overflowY="auto" maxHeight="70vh">
-          {PLANES.map((p) => (
+          {PLANES.filter(
+            (p) => p.facultad === facultadDePlan(user.carrera.id),
+          ).map((p) => (
             <MenuItem
               key={p.nombrecorto}
               display="flex"

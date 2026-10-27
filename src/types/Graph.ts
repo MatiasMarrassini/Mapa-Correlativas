@@ -113,6 +113,7 @@ export namespace GraphType {
     desaprobar(id: string): void;
     restartGraphCuatris(): void;
     changeCarrera(id: string): void;
+    changeFacultad(facultadid: string): void;
     changeOrientacion(id: string): void;
     changeFinDeCarrera(id: string): void;
     toggleCheckbox(c: string, forceTrue?: boolean): void;

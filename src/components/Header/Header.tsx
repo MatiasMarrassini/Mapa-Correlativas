@@ -8,6 +8,7 @@ import {
 import { GraphContext } from "../../MapContext";
 import MateriaDisplay from "./MateriaDisplay";
 import DropdownCarreras from "./DropdownCarreras";
+import DropdownFacultades from "./DropdownFacultades";
 import UserMenu from "./UserMenu";
 import React from "react";
 import { Property } from "csstype";
@@ -53,7 +54,10 @@ const Header = () => {
       {!displayedNode && (
         <Flex {...CommonProps} {...(!displayedNode && FlexProps)}>
           <UserMenu />
-          <DropdownCarreras />
+          <Flex gap={2} align="center">
+            <DropdownFacultades />
+            <DropdownCarreras />
+          </Flex>
         </Flex>
       )}
     </Box>
