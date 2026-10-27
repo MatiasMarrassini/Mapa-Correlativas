@@ -498,7 +498,7 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     const checkboxes = user.carrera.creditos.checkbox
       ?.filter((c) => c.check === true)
       .map((c) => c.nombre);
-    saveUserGraph(user, materias, checkboxes, optativas, aplazos);
+    saveUserGraph(user, materias, checkboxes, optativas, aplazos, {});
   };
 
   ///

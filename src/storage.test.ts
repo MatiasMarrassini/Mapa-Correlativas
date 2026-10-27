@@ -58,6 +58,8 @@ test("parsearRegistro rechaza campos opcionales con forma inválida", () => {
     conCarrera({ aplazos: "2" }),
     conCarrera({ orientacion: 3 }),
     conCarrera({ finDeCarrera: {} }),
+    conCarrera({ elecciones: [] }),
+    conCarrera({ elecciones: { OPT1: 3 } }),
     JSON.stringify({
       carreras: { x: { materias: [{ id: "a", nota: 4, cuatrimestre: "x" }] } },
     }),
@@ -78,6 +80,7 @@ test("parsearRegistro acepta un registro completo válido", () => {
         checkboxes: ["Prueba de nivel de idioma inglés"],
         optativas: [{ id: 1, nombre: "Materia Optativa", creditos: 4 }],
         aplazos: 1,
+        elecciones: { OPT1: "3.4.228" },
       },
     },
   };
@@ -129,4 +132,23 @@ test("armarCarreraData: un checkbox solo alcanza para guardar", () => {
       aplazos: 0,
     }),
   ).toEqual({ materias: [], checkboxes: ["Examen de Inglés"] });
+});
+
+test("armarCarreraData: solo elecciones alcanza para guardar", () => {
+  expect(
+    armarCarreraData({
+      materias: [],
+      optativas: [],
+      aplazos: 0,
+      elecciones: { OPT1: "3.4.228" },
+    }),
+  ).toEqual({ materias: [], elecciones: { OPT1: "3.4.228" } });
+  expect(
+    armarCarreraData({
+      materias: [],
+      optativas: [],
+      aplazos: 0,
+      elecciones: {},
+    }),
+  ).toBeUndefined();
 });

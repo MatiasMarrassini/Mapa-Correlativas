@@ -42,7 +42,11 @@ const esCarreraData = (x: unknown) =>
   opcional(x.finDeCarrera, esString) &&
   opcional(x.checkboxes, esListaDe(esString)) &&
   opcional(x.optativas, esListaDe(esOptativa)) &&
-  opcional(x.aplazos, esNumero);
+  opcional(x.aplazos, esNumero) &&
+  opcional(
+    x.elecciones,
+    (e) => esObjeto(e) && Object.values(e).every(esString),
+  );
 
 // Valida un registro que viene de afuera (localStorage o un archivo importado)
 // Si la forma no es la esperada devuelve null; si faltan campos opcionales los completa
@@ -106,6 +110,7 @@ export const armarCarreraData = (datos: {
   checkboxes?: string[];
   optativas: GraphType.Optativa[];
   aplazos: number;
+  elecciones?: UserType.Elecciones;
 }): UserType.CarreraData | undefined => {
   const {
     materias,
@@ -114,14 +119,17 @@ export const armarCarreraData = (datos: {
     checkboxes,
     optativas,
     aplazos,
+    elecciones,
   } = datos;
+  const hayElecciones = !!elecciones && Object.keys(elecciones).length > 0;
   const vacio =
     materias.every((m) => m.id === "CBC") &&
     !orientacion &&
     !finDeCarrera &&
     !checkboxes?.length &&
     !optativas.length &&
-    !aplazos;
+    !aplazos &&
+    !hayElecciones;
   if (vacio) return undefined;
 
   return {
@@ -131,6 +139,7 @@ export const armarCarreraData = (datos: {
     ...(checkboxes?.length && { checkboxes }),
     ...(optativas.length && { optativas }),
     ...(aplazos && { aplazos }),
+    ...(hayElecciones && { elecciones }),
   };
 };
 

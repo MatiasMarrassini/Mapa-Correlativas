@@ -110,6 +110,7 @@ export namespace UserType {
     checkboxes?: string[];
     optativas?: GraphType.Optativa[];
     aplazos?: number;
+    elecciones?: Elecciones;
   }
 
   // Todo lo que se guarda en el navegador (y lo que se exporta/importa)
@@ -127,6 +128,7 @@ export namespace UserType {
       checkboxes: string[] | undefined,
       optativas: GraphType.Optativa[],
       aplazos: number,
+      elecciones: Elecciones,
     ): void;
   }
 

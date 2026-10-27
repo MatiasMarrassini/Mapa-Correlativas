@@ -54,6 +54,7 @@ const User = (): UserType.Context => {
     checkboxes,
     optativas,
     aplazos,
+    elecciones,
   ) => {
     const carreraData = armarCarreraData({
       materias,
@@ -62,6 +63,7 @@ const User = (): UserType.Context => {
       checkboxes,
       optativas,
       aplazos,
+      elecciones,
     });
     actualizarRegistro((registro) => {
       const carreras = { ...registro.carreras };
