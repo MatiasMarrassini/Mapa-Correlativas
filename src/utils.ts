@@ -62,3 +62,10 @@ export const ajustarProporciones = (creditos: GraphType.Credito[]) => {
   if (masGrande?.proportion)
     masGrande.proportion += 10 - creditos.reduce(accProportion, 0);
 };
+
+// El mapa se reencuadra la primera vez que se mide y cuando cambia el ancho,
+// pero no cuando solo cambia el alto
+export const cambioElAncho = (
+  anterior: number | undefined,
+  actual: number | undefined,
+) => actual !== undefined && anterior !== actual;

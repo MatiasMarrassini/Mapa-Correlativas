@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { ajustarProporciones } from "./utils";
+import { ajustarProporciones, cambioElAncho } from "./utils";
 import { GraphType } from "./types/Graph";
 
 const seg = (creditosNecesarios: number): GraphType.Credito => ({
@@ -23,4 +23,11 @@ test.each([
   ajustarProporciones(cs);
   expect(suma(cs)).toBe(10);
   cs.forEach((c) => expect(c.proportion).toBeGreaterThanOrEqual(1));
+});
+
+test("cambioElAncho: solo un cambio de ancho reencuadra el mapa", () => {
+  expect(cambioElAncho(undefined, 375)).toBe(true); // primera vez
+  expect(cambioElAncho(375, 375)).toBe(false); // solo cambió el alto
+  expect(cambioElAncho(375, 812)).toBe(true); // rotó el celular
+  expect(cambioElAncho(375, undefined)).toBe(false); // todavía sin medir
 });

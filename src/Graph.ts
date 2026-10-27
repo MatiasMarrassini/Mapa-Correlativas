@@ -14,7 +14,7 @@ import {
 import { planesDeFacultad, tieneCBC } from "./planes";
 import { conCarreraElegida } from "./storage";
 import { COLORS, DOT_PATTERN_CONFIG } from "./theme";
-import { accCreditos, ajustarProporciones } from "./utils";
+import { accCreditos, ajustarProporciones, cambioElAncho } from "./utils";
 import { UserType } from "./types/User";
 import { GraphType } from "./types/Graph";
 import { ReactGraphVisType } from "./types/ReactGraphVis";
@@ -50,11 +50,16 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
   );
 
   // Cuando cambia el tamaño de la pantalla, se redibuja la red. Sin esto, se rompe
+  // Solo reencuadramos (fit) si cambio el ancho: si solo cambia el alto (la barra de arriba
+  // crece al seleccionar una materia, o el navegador del celular muestra/oculta su barra)
+  // no queremos perder el zoom que hizo el usuario
   const { ref: networkRef, width, height } = useResizeObserver();
+  const anchoAnterior = React.useRef<number>();
   React.useEffect(() => {
     if (!network) return;
     network.redraw();
-    network.fit();
+    if (cambioElAncho(anchoAnterior.current, width)) network.fit();
+    if (width !== undefined) anchoAnterior.current = width;
   }, [network, width, height]);
 
   const edges = React.useMemo(() => {
