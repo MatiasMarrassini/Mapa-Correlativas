@@ -17,6 +17,7 @@ import {
 import { Property } from "csstype";
 import { FaUndo } from "react-icons/fa";
 import { GraphContext, UserContext } from "../../MapContext";
+import ExportarImportar from "./ExportarImportar";
 
 const ButtonProps = {
   bg: "teal.500",
@@ -35,7 +36,7 @@ const TooltipProps = {
 
 // Menu para elegir orientacion y fin de carrera (solo si el plan tiene algo para elegir)
 // Es un botoncito de settings arriba a la izquierda de la app
-// Tambien el boton para reiniciar los cuatrimestres planeados
+// Tambien los botones para exportar/importar el avance y reiniciar los cuatrimestres planeados
 // (no hay boton de guardar: todo se guarda solo)
 const UserMenu = () => {
   const { user } = React.useContext(UserContext);
@@ -115,6 +116,7 @@ const UserMenu = () => {
           </MenuList>
         </Menu>
       )}
+      <ExportarImportar />
       {getters.Cuatrimestres().length > 0 && (
         <Tooltip {...TooltipProps} label="Limpiar todos los cuatris">
           <IconButton
