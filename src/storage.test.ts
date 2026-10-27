@@ -47,6 +47,43 @@ test("parsearRegistro rechaza formas inválidas", () => {
   ].forEach((t) => expect([t, parsearRegistro(t)]).toEqual([t, null]));
 });
 
+test("parsearRegistro rechaza campos opcionales con forma inválida", () => {
+  const conCarrera = (extra: object) =>
+    JSON.stringify({ carreras: { x: { materias: [], ...extra } } });
+  [
+    conCarrera({ optativas: {} }),
+    conCarrera({ optativas: [{ id: "1", nombre: "x", creditos: 4 }] }),
+    conCarrera({ checkboxes: "Inglés" }),
+    conCarrera({ checkboxes: [1] }),
+    conCarrera({ aplazos: "2" }),
+    conCarrera({ orientacion: 3 }),
+    conCarrera({ finDeCarrera: {} }),
+    JSON.stringify({
+      carreras: { x: { materias: [{ id: "a", nota: 4, cuatrimestre: "x" }] } },
+    }),
+    JSON.stringify({ carreras: {}, ultimaPorFacultad: { uade: 5 } }),
+  ].forEach((t) => expect([t, parsearRegistro(t)]).toEqual([t, null]));
+});
+
+test("parsearRegistro acepta un registro completo válido", () => {
+  const r = {
+    version: 1,
+    ultimaCarrera: "informatica",
+    ultimaPorFacultad: { fiuba: "informatica" },
+    carreras: {
+      informatica: {
+        materias: [{ id: "75.01", nota: 7, cuatrimestre: 2025.5 }],
+        orientacion: "Gestión Industrial de Sistemas",
+        finDeCarrera: "tesis",
+        checkboxes: ["Prueba de nivel de idioma inglés"],
+        optativas: [{ id: 1, nombre: "Materia Optativa", creditos: 4 }],
+        aplazos: 1,
+      },
+    },
+  };
+  expect(parsearRegistro(JSON.stringify(r))).toEqual(r);
+});
+
 test("parsearRegistro completa campos y descarta claves ajenas", () => {
   const r = parsearRegistro(JSON.stringify({ padron: "1", carreras: {} }));
   expect(r).toEqual(registroInicial());

@@ -17,13 +17,32 @@ export const registroInicial = (): UserType.Registro => ({
 const esObjeto = (x: unknown): x is Record<string, unknown> =>
   typeof x === "object" && x !== null && !Array.isArray(x);
 
+// Un campo opcional esta bien si falta o si cumple la condicion
+const opcional = (x: unknown, ok: (x: unknown) => boolean) =>
+  x === undefined || ok(x);
+const esString = (x: unknown) => typeof x === "string";
+const esNumero = (x: unknown) => typeof x === "number";
+const esListaDe = (ok: (x: unknown) => boolean) => (x: unknown) =>
+  Array.isArray(x) && x.every(ok);
+
+const esMateria = (m: unknown) =>
+  esObjeto(m) &&
+  esString(m.id) &&
+  esNumero(m.nota) &&
+  opcional(m.cuatrimestre, esNumero);
+
+const esOptativa = (o: unknown) =>
+  esObjeto(o) && esNumero(o.id) && esString(o.nombre) && esNumero(o.creditos);
+
+// Validamos todo lo que despues usa el grafo: un campo con otra forma lo rompe
 const esCarreraData = (x: unknown) =>
   esObjeto(x) &&
-  Array.isArray(x.materias) &&
-  x.materias.every(
-    (m) =>
-      esObjeto(m) && typeof m.id === "string" && typeof m.nota === "number",
-  );
+  esListaDe(esMateria)(x.materias) &&
+  opcional(x.orientacion, esString) &&
+  opcional(x.finDeCarrera, esString) &&
+  opcional(x.checkboxes, esListaDe(esString)) &&
+  opcional(x.optativas, esListaDe(esOptativa)) &&
+  opcional(x.aplazos, esNumero);
 
 // Valida un registro que viene de afuera (localStorage o un archivo importado)
 // Si la forma no es la esperada devuelve null; si faltan campos opcionales los completa
@@ -36,6 +55,13 @@ export const parsearRegistro = (texto: string): UserType.Registro | null => {
   }
   if (!esObjeto(data) || !esObjeto(data.carreras)) return null;
   if (!Object.values(data.carreras).every(esCarreraData)) return null;
+  if (
+    !opcional(
+      data.ultimaPorFacultad,
+      (x) => esObjeto(x) && Object.values(x).every(esString),
+    )
+  )
+    return null;
 
   const inicial = registroInicial();
   return {
@@ -44,9 +70,9 @@ export const parsearRegistro = (texto: string): UserType.Registro | null => {
       typeof data.ultimaCarrera === "string"
         ? data.ultimaCarrera
         : inicial.ultimaCarrera,
-    ultimaPorFacultad: esObjeto(data.ultimaPorFacultad)
-      ? (data.ultimaPorFacultad as UserType.Registro["ultimaPorFacultad"])
-      : inicial.ultimaPorFacultad,
+    ultimaPorFacultad:
+      (data.ultimaPorFacultad as UserType.Registro["ultimaPorFacultad"]) ??
+      inicial.ultimaPorFacultad,
     carreras: data.carreras as UserType.Registro["carreras"],
   };
 };
