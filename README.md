@@ -13,6 +13,7 @@ Elegís tu facultad y tu carrera, marcás las materias que aprobaste y ves de un
 - **Correlativas:** las materias se habilitan cuando aprobás sus correlativas; al pasar el mouse se resaltan.
 - **Progreso y promedio:** barra de avance por grupo (obligatorias, electivas, requisitos como el examen de inglés) y promedio con aplazos.
 - **Planificación:** asignar materias a cuatrimestres futuros.
+- **Optativas:** en los planes que lo declaran (UADE), elegís qué optativa cursás en cada lugar (buscando por nombre o código), con sus correlativas.
 - **Sin cuentas ni servidor:** todo se guarda automáticamente en tu navegador.
 - **Exportar / importar:** bajás tu avance a un `.json` y lo cargás en otro navegador (o lo usás de respaldo).
 
@@ -40,7 +41,8 @@ npm test    # tests de datos, guardado y helpers
 2. En `src/carreras.ts`:
    - sumar la facultad a `FACULTADES`;
    - agregar cada plan a `CARRERAS` (`unidad: "horas"` si no se cuentan créditos; `creditos.total`, y requisitos que no son materias en `creditos.checkbox`);
-   - agruparlos en `PLANES` con su `facultad`.
+   - agruparlos en `PLANES` con su `facultad`;
+   - si el plan tiene lugares de optativa para elegir, declararlos en `optativasDelPlan` (qué nodos son lugares y la lista de optativas, en otro json).
 
 Los tests (`src/carreras.test.ts`) verifican que todas las correlativas existan y que cada plan esté en una facultad.
 
@@ -49,7 +51,7 @@ Los tests (`src/carreras.test.ts`) verifican que todas las correlativas existan 
 Este proyecto es un fork de FIUBA-Map. Respecto del original:
 
 - Selector de facultad y soporte para planes medidos en horas y sin CBC.
-- Plan de Ingeniería en Informática de UADE (2021).
+- Plan de Ingeniería en Informática de UADE (2021), con sus optativas para elegir.
 - Sin login por padrón ni base de datos remota: guardado automático en `localStorage`, con exportar/importar.
 - Tests con Jest para los datos, el guardado y los helpers de planes.
 
