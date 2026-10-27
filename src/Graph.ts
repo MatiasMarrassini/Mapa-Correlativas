@@ -313,6 +313,13 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
   React.useEffect(() => {
     if (!network || graph.key !== network.key) return;
 
+    // Antes de cargar, limpiamos todo: al importar sobre el plan abierto la red no se
+    // recrea, y lo que hay en pantalla no se tiene que mezclar con lo importado
+    user.carrera.creditos.checkbox?.forEach((ch) => (ch.check = false));
+    nodes.update(
+      getters.ALL().map((n) => getNode(n.id).desaprobar().cursando(undefined)),
+    );
+
     // Nos fijamos que el usuario tenga un mapa guardado para este plan
     const map = user.registro.carreras[user.carrera.id];
     if (map) {
@@ -358,14 +365,8 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     } else {
       // Si no tengo mapa guardado (porque es la primera vez en este plan, o importe un registro sin el),
       //   reseteo absolutamente todo y solamente apruebo el CBC (si el plan tiene)
-      user.carrera.creditos.checkbox?.forEach((ch) => (ch.check = false));
       optativasDispatch({ action: "override", value: [] });
       setAplazos(0);
-      nodes.update(
-        getters
-          .ALL()
-          .map((n) => getNode(n.id).desaprobar().cursando(undefined)),
-      );
       if (tieneCBC(user.carrera)) aprobar("CBC", 0);
       else actualizar();
       actualizarNiveles();
