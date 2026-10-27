@@ -7,7 +7,7 @@ import Node from "./Node";
 import { planesDeFacultad, tieneCBC } from "./planes";
 import { conCarreraElegida } from "./storage";
 import { COLORS, DOT_PATTERN_CONFIG } from "./theme";
-import { accCreditos, accCreditosNecesarios, accProportion } from "./utils";
+import { accCreditos, ajustarProporciones } from "./utils";
 import { UserType } from "./types/User";
 import { GraphType } from "./types/Graph";
 import { ReactGraphVisType } from "./types/ReactGraphVis";
@@ -800,15 +800,16 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
       return electivasCreditos;
     };
 
-    // Primeros creditos a mostrar: los 38 del CBC
+    // Primeros creditos a mostrar: los 38 del CBC (si el plan tiene CBC)
     // Lo mostramos como siempre aprobado del todo
     const cbc = getters.CBC();
-    creditos.push({
-      ...CREDITOS["CBC"],
-      creditosNecesarios: cbc.reduce(accCreditos, 0),
-      creditos: cbc.reduce(accCreditos, 0),
-      nmaterias: cbc.length,
-    });
+    if (cbc.length > 0)
+      creditos.push({
+        ...CREDITOS["CBC"],
+        creditosNecesarios: cbc.reduce(accCreditos, 0),
+        creditos: cbc.reduce(accCreditos, 0),
+        nmaterias: cbc.length,
+      });
 
     // Despues, las obligatorias
     const allObligatorias = getters.Obligatorias();
@@ -822,21 +823,27 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     });
 
     // Despues, las electivas, incluyendo las orientaciones no elegidas
+    // Si el plan dice explicitamente que no tiene electivas (ej. UADE), no las mostramos
     const electivas = getters.ElectivasAprobadas();
     const electivasCreditosNecesarios = getElectivasCreditos(
       getCorrectCreditos().electivas,
     );
+    const sinElectivas =
+      getCorrectCreditos().electivas === 0 &&
+      !electivas.length &&
+      !optativas.length;
 
-    creditos.push({
-      ...CREDITOS["Electivas"],
-      creditosNecesarios: electivasCreditosNecesarios,
-      nmaterias: electivas.length,
-      creditos:
-        electivas.reduce(accCreditos, 0) + optativas.reduce(accCreditos, 0),
-      helpText:
-        !electivasCreditosNecesarios &&
-        `Elegí ${user.carrera.eligeOrientaciones && !user.orientacion ? "orientación" : ""}${user.carrera.eligeOrientaciones && !user.orientacion && !user.finDeCarrera ? " y " : ""}${!user.finDeCarrera ? "entre tesis y tpp" : ""} en la configuración de usuario para saber cuantos necesitás.`,
-    });
+    if (!sinElectivas)
+      creditos.push({
+        ...CREDITOS["Electivas"],
+        creditosNecesarios: electivasCreditosNecesarios,
+        nmaterias: electivas.length,
+        creditos:
+          electivas.reduce(accCreditos, 0) + optativas.reduce(accCreditos, 0),
+        helpText:
+          !electivasCreditosNecesarios &&
+          `Elegí ${user.carrera.eligeOrientaciones && !user.orientacion ? "orientación" : ""}${user.carrera.eligeOrientaciones && !user.orientacion && !user.finDeCarrera ? " y " : ""}${!user.finDeCarrera ? "entre tesis y tpp" : ""} en la configuración de usuario para saber cuantos necesitás.`,
+      });
 
     // Despues, orientacion obligatoria (si hay)
     const orientacion = getters.OrientacionAprobadas();
@@ -929,20 +936,7 @@ const Graph = (userContext: UserType.Context): GraphType.Context => {
     }
 
     // Hacemos que el tamaño de las barritas sea proporcional a su peso sobre el total para recibirte
-    const totalNecesarios = creditos.reduce(accCreditosNecesarios, 0);
-    creditos.forEach((c) => {
-      c.proportion =
-        Math.round((c.creditosNecesarios / totalNecesarios) * 10) || 1;
-    });
-
-    const fullProportion = creditos.reduce(accProportion, 0);
-    const obligatoriasCredito = creditos[1]!;
-    if (obligatoriasCredito.proportion) {
-      if (fullProportion > 10)
-        obligatoriasCredito.proportion -= fullProportion - 10;
-      else if (fullProportion < 10)
-        obligatoriasCredito.proportion += 10 - fullProportion;
-    }
+    ajustarProporciones(creditos);
     setCreditos(creditos);
   };
 

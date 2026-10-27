@@ -43,3 +43,22 @@ export const getCurrentCuatri = () => {
   else if (month > 6) cuatri += 0.5;
   return cuatri;
 };
+
+// Le da a cada barrita de progreso un tamaño proporcional a su peso sobre el total
+// (en una grilla de 10 columnas, minimo 1 cada una), y la diferencia de redondeo
+// se la come la barrita mas grande
+export const ajustarProporciones = (creditos: GraphType.Credito[]) => {
+  const totalNecesarios = creditos.reduce(accCreditosNecesarios, 0);
+  creditos.forEach((c) => {
+    c.proportion =
+      Math.round((c.creditosNecesarios / totalNecesarios) * 10) || 1;
+  });
+
+  const masGrande = creditos.reduce<GraphType.Credito | undefined>(
+    (max, c) =>
+      !max || c.creditosNecesarios > max.creditosNecesarios ? c : max,
+    undefined,
+  );
+  if (masGrande?.proportion)
+    masGrande.proportion += 10 - creditos.reduce(accProportion, 0);
+};

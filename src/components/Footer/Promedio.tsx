@@ -18,12 +18,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React from "react";
-import { GraphContext } from "../../MapContext";
+import { GraphContext, UserContext } from "../../MapContext";
+import { tieneCBC } from "../../planes";
 import { promediar } from "../../utils";
 
 // Componente para mostrar el promedio general de la carrera
 // y en hover mostrar el promedio con CBC y poder agregar aplazos
 const Promedio = () => {
+  const { user } = React.useContext(UserContext);
   const { getters, aplazos, setAplazos } = React.useContext(GraphContext);
 
   const promedio = React.useMemo(() => {
@@ -84,12 +86,14 @@ const Promedio = () => {
             </Text>
             <Text fontSize="md">{promedio.promedioConAplazos}</Text>
           </Flex>
-          <Flex justifyContent="space-between" alignItems="center">
-            <Text fontSize="md">
-              <strong>Promedio con CBC</strong>
-            </Text>
-            <Text fontSize="md">{promedio.promedioConCBC}</Text>
-          </Flex>
+          {tieneCBC(user.carrera) && (
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text fontSize="md">
+                <strong>Promedio con CBC</strong>
+              </Text>
+              <Text fontSize="md">{promedio.promedioConCBC}</Text>
+            </Flex>
+          )}
         </PopoverBody>
       </PopoverContent>
     </Popover>

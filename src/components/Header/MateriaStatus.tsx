@@ -12,6 +12,7 @@ import {
 import { QuestionIcon } from "@chakra-ui/icons";
 import React from "react";
 import { GraphContext, UserContext } from "../../MapContext";
+import { unidadTexto } from "../../planes";
 
 // Cuando hay una materia seleccionada, te muestra el codigo, cuantos creditos da, etc
 const MateriaStatus = () => {
@@ -57,7 +58,7 @@ const MateriaStatus = () => {
         <Badge width="100%" px={2} colorScheme="green" variant="outline">
           {node?.id === "CBC"
             ? `Clickealo para ver las materias!`
-            : `Otorga ${node?.creditos} créditos`}
+            : `Otorga ${node?.creditos} ${unidadTexto(user.carrera)}`}
         </Badge>
 
         {node?.requiere && (
@@ -66,7 +67,7 @@ const MateriaStatus = () => {
             label="El plan de estudios no es muy claro de si hay que contabilizar los créditos del CBC para esto, entonces no estoy seguro de que es válido acá. Además, los docentes suelen hacer lo que quieren con esto, así que toma todo con pinzas y asegurate de poder cursar la materia antes de anotarte."
           >
             <Badge width="100%" px={2} colorScheme="orange" variant="outline">
-              Requiere {node?.requiere} créditos{" "}
+              Requiere {node?.requiere} {unidadTexto(user.carrera)}{" "}
               {node?.requiereCBC ? (
                 "(con CBC)"
               ) : node?.requiereCBC === false ? (

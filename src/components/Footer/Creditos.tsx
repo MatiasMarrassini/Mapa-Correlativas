@@ -34,11 +34,14 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { GraphContext, UserContext } from "../../MapContext";
+import { unidadTexto } from "../../planes";
 
 // Componente para mostrar los creditos totales de la carrera
 // y en hover setupear creditos por fuera del plan (materias optativas)
 const Creditos = () => {
   const { user } = React.useContext(UserContext);
+  const unidad = unidadTexto(user.carrera);
+  const Unidad = unidad.charAt(0).toUpperCase() + unidad.slice(1);
   const { optativas, optativasDispatch, creditos } =
     React.useContext(GraphContext);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -86,11 +89,11 @@ const Creditos = () => {
           <Box w={{ base: "12ch", md: "16ch" }}>
             <Stat p="0.4em" color="white" size="sm">
               <StatLabel>
-                Créditos
+                {Unidad}
                 <Tooltip
                   placement="right"
                   hasArrow
-                  label="Agregar créditos de optativas"
+                  label={`Agregar ${unidad} de optativas`}
                 >
                   <PlusSquareIcon
                     ml={1}
@@ -140,7 +143,7 @@ const Creditos = () => {
                     <Tooltip placement="top" label="Motivo" hasArrow>
                       <EditableInput px={2} width="12rem" noOfLines={1} />
                     </Tooltip>
-                    <Tooltip placement="top" label="Créditos" hasArrow>
+                    <Tooltip placement="top" label={Unidad} hasArrow>
                       <NumberInput
                         mx={2}
                         borderRadius={5}
@@ -188,7 +191,7 @@ const Creditos = () => {
             <Flex justifyContent="space-between">
               <Text mr={4} alignSelf="center">
                 <strong>
-                  Créditos por fuera del plan: {creditosOptativas}
+                  {Unidad} por fuera del plan: {creditosOptativas}
                 </strong>
               </Text>
               <Flex gap={2}>
@@ -216,7 +219,7 @@ const Creditos = () => {
                   label={
                     <>
                       <Text>
-                        Los créditos por fuera del plan contabilizan como
+                        Los {unidad} por fuera del plan contabilizan como
                         materias electivas y no influyen en el promedio.
                       </Text>
                       <Text>

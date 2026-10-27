@@ -22,11 +22,13 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { FaGraduationCap } from "react-icons/fa";
-import { GraphContext } from "../../MapContext";
+import { GraphContext, UserContext } from "../../MapContext";
+import { unidadTexto } from "../../planes";
 
-// Componente con una barra de progresso para mostrar todos los creditos de las
+// Componente con una barra de progresso para mostrar todos los creditos (u horas) de las
 // materias aprobadas
 const ProgressBar = () => {
+  const { user } = React.useContext(UserContext);
   const { creditos, toggleCheckbox } = React.useContext(GraphContext);
 
   return (
@@ -107,7 +109,7 @@ const ProgressBar = () => {
                       {c.creditos}
                       {!!c.creditosNecesarios &&
                         ` de ${c.creditosNecesarios} `}{" "}
-                      créditos
+                      {unidadTexto(user.carrera)}
                     </StatNumber>
                   )}
                   {!!c.nmaterias && (
